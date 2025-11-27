@@ -310,7 +310,8 @@ class MemFSFileSearchProvider implements vscode.FileSearchProvider {
     token: vscode.CancellationToken,
   ): Promise<vscode.Uri[]> {
     const results: vscode.Uri[] = [];
-    const pattern = query.pattern.toLowerCase();
+    const pattern = query.pattern;
+    const patternLower = pattern.toLowerCase();
 
     const searchInFolder = async (folderPath: string): Promise<void> => {
       if (token.isCancellationRequested) {
@@ -333,7 +334,8 @@ class MemFSFileSearchProvider implements vscode.FileSearchProvider {
             }
             await searchInFolder(entryPath);
           } else if (stat.isFile()) {
-            if (entry.toLowerCase().includes(pattern)) {
+            // File search uses case-insensitive matching by default (consistent with VS Code behavior)
+            if (entry.toLowerCase().includes(patternLower)) {
               results.push(
                 vscode.Uri.parse(`${this.memFs.scheme}:${entryPath}`),
               );
